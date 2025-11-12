@@ -35,10 +35,38 @@ document.addEventListener("DOMContentLoaded", () => {
 
         // Populate participants list safely (avoid HTML injection)
         const ul = activityCard.querySelector(".participants-list");
+        ul.style.listStyle = "none";
+        ul.style.marginLeft = "0";
         if (details.participants && details.participants.length > 0) {
           details.participants.forEach((p) => {
             const li = document.createElement("li");
+            li.style.display = "flex";
+            li.style.alignItems = "center";
+            li.style.gap = "8px";
             li.textContent = p;
+            // Add delete icon
+            const deleteBtn = document.createElement("span");
+            deleteBtn.innerHTML = "&#128465;"; // Trash icon
+            deleteBtn.title = "Désinscrire";
+            deleteBtn.style.cursor = "pointer";
+            deleteBtn.style.color = "#c62828";
+            deleteBtn.style.fontSize = "16px";
+            deleteBtn.onclick = async () => {
+              if (confirm(`Désinscrire ${p} de ${name} ?`)) {
+                try {
+                  const response = await fetch(`/activities/${encodeURIComponent(name)}/unregister?email=${encodeURIComponent(p)}`, { method: "POST" });
+                  const result = await response.json();
+                  if (response.ok) {
+                    li.remove();
+                  } else {
+                    alert(result.detail || "Erreur lors de la désinscription");
+                  }
+                } catch (error) {
+                  alert("Erreur réseau lors de la désinscription");
+                }
+              }
+            };
+            li.appendChild(deleteBtn);
             ul.appendChild(li);
           });
         } else {
@@ -81,6 +109,8 @@ document.addEventListener("DOMContentLoaded", () => {
         messageDiv.textContent = result.message;
         messageDiv.className = "success";
         signupForm.reset();
+        // Rafraîchir la liste des activités pour afficher le nouveau participant
+        await fetchActivities();
       } else {
         messageDiv.textContent = result.detail || "An error occurred";
         messageDiv.className = "error";

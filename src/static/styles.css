@@ -157,16 +157,21 @@ footer {
   font-weight: 600;
 }
 
+
 .participants-list {
-  list-style: disc;
-  margin: 8px 0 0 20px;
+  list-style: none;
+  margin: 8px 0 0 0;
   padding: 0;
 }
+
 
 .participants-list li {
   padding: 4px 0;
   color: #444;
   font-size: 14px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
 }
 
 .participants-list li.muted {
